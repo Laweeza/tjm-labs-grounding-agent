@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from tjm-labs-grounding-agent!")
+"""tjm_labs_grounding_agent: vision-based desktop automation and grounding."""

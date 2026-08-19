@@ -1,4 +1,3 @@
-"""Desktop screenshot capture"""
 
 import mss
 from PIL import Image

@@ -14,6 +14,7 @@ import base64
 import io
 import json
 import logging
+import re
 from dataclasses import dataclass
 
 import anthropic
@@ -35,27 +36,49 @@ class GroundResult:
     found: bool = True
 
 
+def _is_confident(result:GroundResult) -> bool:
+    """Return whether a grounding result is usable"""
+
+    return (
+        result.found
+        and result.confidence >= CONFIDENCE_THRESHOLD
+    )
+
+
 def ground_element(screenshot: Image.Image, instruction: str) -> GroundResult:
-    """
-    Stage 1: coarse grounding on the full screenshot.
-    Stage 2 (ReGround): crop around the coarse prediction, re-query on
-    the crop, map the refined point back to full-screen coordinates.
-    Fallback: if pass is low confidence or found nothing, retry against full image
-    """
+    """Locate a screen element using a coarse pass and one ReGround pass"""
+
     coarse = _vlm_ground(screenshot, instruction)
-    if not coarse.found:
-        log.warning("Pass found nothing")
+    coarse.method = "coarse"
+
+    log.info(
+        "Coarse grounding: found=%s confidence=%.2f coordinates=(%d, %d)",
+        coarse.found,
+        coarse.confidence,
+        coarse.x,
+        coarse.y
+    )
+    if not _is_confident(coarse):
         return coarse
 
+   # Crop around the coarse location and locate it again
     crop, offset = _crop_around(screenshot, coarse, size=RECROP_SIZE)
+
     refined = _vlm_ground(crop, instruction)
 
-    if not refined.found or refined.confidence < CONFIDENCE_THRESHOLD:
-        log.warning("ReGround low-confidence/miss, faillling back to full image grounding")
-        fallback = _vlm_ground(screenshot, instruction)
-        fallback.method = "fallback"
-        return fallback
-    
+    log.info(
+        "ReGround: found =%s confidence=%.2f crop_coordinates=(%d,%d)",
+        refined.found,
+        refined.confidence,
+        refined.x,
+        refined.y
+    )
+
+    if not _is_confident(refined):
+        log.info("ReGround unsuccessful; using coarse result")
+        return coarse
+
+    # The crop's position is added to convert them back to screen coordinates
     x, y = refined.x + offset[0], refined.y + offset[1]
     return GroundResult(x=x, y=y, confidence=refined.confidence, method="reground")
 
@@ -69,6 +92,26 @@ def _prep_img_for_api(image: Image.Image):
     scale = MAX_DIM / longest
     resized = image.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
     return resized, scale
+
+
+def _extract_json(text: str) -> dict | None:
+    """Parse text as JSON, falling back to extracting the first {...} block
+    if the model added reasoning or other prose before/after the JSON
+    despite being instructed to respond with only JSON."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+
+    return None
+
 
 def _vlm_ground(image: Image.Image, instruction: str) -> GroundResult:
     """Single VLM call: send image + instruction, parse returned coordinates."""
@@ -99,9 +142,8 @@ def _vlm_ground(image: Image.Image, instruction: str) -> GroundResult:
     text = response.content[0].text.strip()
     text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
 
-    try:
-        data = json.loads(text)
-    except json.JSONDecodeError:
+    data = _extract_json(text)
+    if data is None:
         log.error(f"Could not parse model response as JSON: {text!r}")
         return GroundResult(x=0, y=0, confidence=0.0, method="coarse", found=False)
 
@@ -126,4 +168,3 @@ def _crop_around(image: Image.Image, point: GroundResult, size: int):
 
     crop = image.crop((left, top, right, bottom))
     return crop, (left, top)
-  

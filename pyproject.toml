@@ -11,6 +11,7 @@ dependencies = [
     "pyautogui>=0.9.54",
     "pywin32>=312",
     "requests>=2.34.2",
+    "pytest>=8.0"
 ]
 
 [project.scripts]
