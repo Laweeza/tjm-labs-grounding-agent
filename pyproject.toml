@@ -1,7 +1,7 @@
 [project]
 name = "tjm-labs-grounding-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "Vision-based desktop automation agent using VLM grounding to locate and interact with desktop icons"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -11,11 +11,12 @@ dependencies = [
     "pyautogui>=0.9.54",
     "pywin32>=312",
     "requests>=2.34.2",
-    "pytest>=8.0"
 ]
 
-[project.scripts]
-tjm-labs-grounding-agent = "tjm_labs_grounding_agent:main"
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]

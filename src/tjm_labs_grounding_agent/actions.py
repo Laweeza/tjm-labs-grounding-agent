@@ -113,7 +113,6 @@ def type_text(window, text: str) -> bool:
 
     return True
 
-
 def save_as(
     window,
     filename: str,
@@ -125,6 +124,7 @@ def save_as(
         return False
 
     full_path = directory / filename
+    file_existed_before = full_path.is_file()
 
     try:
         pyautogui.hotkey("ctrl", "s")
@@ -144,12 +144,18 @@ def save_as(
         log.exception("Could not enter the save path")
         return False
 
-    deadline = time.monotonic() + timeout
+    # If a file with this name already existed, Windows shows an extra
+    # "Confirm Save As" overwrite prompt on top of the Save dialog.
+    if file_existed_before:
+        overwrite_dialog = wait_for_active_window("Confirm Save As", timeout=2.0)
+        if overwrite_dialog is not None:
+            log.info("Confirming overwrite of existing file: %s", full_path)
+            pyautogui.press("enter")  # default button is "Yes"
 
+    deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         if full_path.is_file():
             return True
-
         time.sleep(POLL_INTERVAL_SECONDS)
 
     log.error("Saved file was not created: %s", full_path)
@@ -184,7 +190,6 @@ def close_window(window, timeout: float = 3.0) -> bool:
 
     log.warning("Window did not close normally, force-closing: %s", title)
     return _force_close_notepad()
-
 
 def _force_close_notepad() -> bool:
     """Last-resort fallback: forcibly terminate any Notepad process."""

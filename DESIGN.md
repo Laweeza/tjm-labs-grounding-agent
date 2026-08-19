@@ -2,6 +2,7 @@
 
 ## Assumptions
 - Target: Windows 11, single monitor, 1920x1080
+    - Developed and tested on Windows 11 ARM running in UTM (QEMU) on a macOS host. This doesn't affect the grounding/automation architecture, but two environment-specific notes: (1) the VM's Windows installation was unactivated, which is why some screenshots show the "Activate Windows" watermark and required a registry edit (rather than the Settings UI) to test dark mode; (2) absolute timing figures in the Performance section reflect VM overhead.
 - Notepad desktop shortcut exists before script runs
 - Access to jsonplaceholder.typicode.com, no auth required
 - "Close Notepad" = save first, then close via standard window close
@@ -22,14 +23,14 @@ The reference paper (Li et al., ScreenSpot-Pro) benchmarks four grounding strate
 | Method | Accuracy | Approach |
 |---|---|---|
 | Single-pass direct | 18.9% | One VLM call, no refinement |
-| Iterative Focusing | 31.0%  | Grounds on the full screen, splits the screenshot into a fixed 2x2 grid, keeps the quadrant containing the prediction, repeats
+| Iterative Zooming | 31.0%  | Grounds on the full screen, splits the screenshot into a fixed 2x2 grid, keeps the quadrant containing the prediction, repeats |
 | Iterative Narrowing | 31.9% | Same iterative procedure, but crops are centered on the prediction each round (half the prior width/height) rather than a fixed grid |
 | **ReGround (chosen)** | **40.2%** | One crop around the coarse prediction, one refinement pass |
 | ScreenSeekeR | 48.1% | Planner (GPT-4o) decomposes instruction into ranked regions, then cascaded recursive search with scoring |
 
-**ReGround Over Other Non-Planner Methods:** ReGround scores higher (40.2% vs 31.9%) with fewer model calls and repeating the cropping and regrounding on multiple rounds. Better on both accuracy and cost for this particular project.
+**ReGround Over Other Non-Planner Methods:** ReGround scored higher than the other two non-planner methods even though it was a single crop and refine pass rather than repeating the crop-and-regrounding cycle across multiple rounds. Higher reported accuracy with fewer model calls seemed appropriate for this project's use case.
 
-**ReGround over ScreenSeekeR:** ScreenSeekeR's ~8-point gain requires a much heavier pipeline (separate planner call, cascaded search, scoring, non-max suppression, 10-20+ calls per grounding operation vs. ReGround's 1-2). For a desktop icon, that would be much added cost/latency.
+**ReGround over ScreenSeekeR:** ScreenSeekeR's 8-point gain requires a much heavier pipeline (separate planner call, cascaded search, scoring, non-max suppression, 10-20+ calls per grounding operation vs. ReGround's 1-2). For a desktop icon, that would be much added cost/latency.
 
 **VLM grounding over template-matching/OCR:** the requirement to locate icons "without a pre-supplied image or exact text" rules out both a template matching method which needs a reference image, and OCR method which needs a visible/known label. VLM grounding needs neither.
 

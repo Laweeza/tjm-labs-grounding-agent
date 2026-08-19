@@ -50,18 +50,18 @@ Logs printed, including grounding confidence
 
 | Task | Command |
 |---|---|
-|Run workflow | uv run main.py
-|Demo on other icon | uv run python demo_grounding.py "the Recycle Bin desktop icon" -- click or uv run demo_grounding.py "the Microsoft Edge desktop icon" --click
-|Run Unit Tests | run pytest -v
-| Script to annotate screenshot | uv run python scripts/annotate_screenshots.py
-| Script to inject popups throughout workflow | uv run python scripts/popup_random_injections.py 
+| Run workflow | ```uv run main.py```
+| Demo on other icon | ```uv run python demo_grounding.py "the Recycle Bin desktop icon" --click``` or ```uv run demo_grounding.py "the Microsoft Edge desktop icon" --click```
+| Run Unit Tests | ```uv run pytest -v```
+| Script to annotate screenshot | ```uv run python scripts/annotate_screenshots.py```
+| Script to inject popups throughout workflow | ```uv run python scripts/popup_injection.py```
 
 
 ### Project Structure
 
 ```
 tjm-labs-grounding-agent/
-├── screenshots/  
+├── screenshots/            # Annotated screenshot deliverables (top-left, bottom-right, center)
 ├── src/
 │   └── tjm_labs_grounding_agent/
 │       ├── capture.py       # Screenshot capture
@@ -74,14 +74,15 @@ tjm-labs-grounding-agent/
 │   ├── annotate_screenshots.py
 |   └── popup_injection.py
 ├── tests/
+|   ├── test_api_client.py
 │   ├── test_grounding.py
 |   └── test_popup.py
 ├── main.py                  # CLI entry point
-├── demo_grounding.py        # Standalone demo of grounding on arbitrary targets           # Annotated screenshot deliverables
+├── demo_grounding.py        # Standalone demo of grounding on arbitrary targets         
 ├── pyproject.toml
 ├── uv.lock
 ├── README.md
-├── designchart.md
+├── designchart.png
 └── DESIGN.md
 ```
 

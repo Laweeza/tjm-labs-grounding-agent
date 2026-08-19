@@ -597,9 +597,13 @@ dependencies = [
     { name = "mss" },
     { name = "pillow" },
     { name = "pyautogui" },
-    { name = "pytest" },
     { name = "pywin32" },
     { name = "requests" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -608,10 +612,12 @@ requires-dist = [
     { name = "mss", specifier = ">=10.2.0" },
     { name = "pillow", specifier = ">=12.3.0" },
     { name = "pyautogui", specifier = ">=0.9.54" },
-    { name = "pytest", specifier = ">=8.0" },
     { name = "pywin32", specifier = ">=312" },
     { name = "requests", specifier = ">=2.34.2" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=8.0" }]
 
 [[package]]
 name = "typing-extensions"

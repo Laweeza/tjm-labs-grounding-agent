@@ -2,13 +2,13 @@
 unexpected popups at random points throughout the ENTIRE run, to verify
 popup detection and recovery hold up across repeated interruptions.
 
-Do not move your own mouse or type during the run - that's direct input
+Do not move your mouse or type during the run - that's direct input
 contention with pyautogui, a different failure mode than an unexpected
 popup, and will interfere with results regardless of recovery logic.
 
 Usage:
-    uv run python test_popup_random_injections.py
-    uv run python test_popup_random_injections.py --limit 5 --min-interval 5 --max-interval 15
+    uv run python scripts/popup_injection.py
+    uv run python scripts/popup_injection.py --limit 5 --min-interval 5 --max-interval 15
 """
 
 import argparse
