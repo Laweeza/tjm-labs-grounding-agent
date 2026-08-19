@@ -21,7 +21,7 @@ from .api_client import fetch_posts, format_post
 from .popup import check_and_dismiss_popup, ground_with_popup_recovery, make_context
 
 POST_LIMIT = 10
-MAX_GROUNDING_ATTEMPTS = 2
+MAX_GROUNDING_ATTEMPTS = 3
 MIN_GROUNDING_CONFIDENCE = 0.5
 DELAY_SECONDS = 1.0
 WINDOW_APPEAR_TIMEOUT = 3.0

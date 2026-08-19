@@ -123,6 +123,7 @@ def _vlm_ground(image: Image.Image, instruction: str) -> GroundResult:
     response = client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=300,
+            temperature=0,
             messages=[{
                 "role": "user",
                 "content": [

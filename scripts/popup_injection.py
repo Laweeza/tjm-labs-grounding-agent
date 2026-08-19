@@ -14,7 +14,6 @@ Usage:
 import argparse
 import logging
 import random
-import subprocess
 import threading
 import time
 

@@ -14,18 +14,25 @@ An automation agent that visually locates and interacts with desktop UI elements
 ## Setup
 1. Clone the repo and install dependencies:
 ```
-git clone <repo-url>
+git clone https://github.com/Laweeza/tjm-labs-grounding-agent.git
 cd tjm-labs-grounding-agent
 uv sync
 ```
 
 2. Set Anthropic API Key:
 ```
+setx ANTHROPIC_API_KEY "your-key-here"
+```
+or set for current session as seen below for PowerShell
+
+```
 $env:ANTHROPIC_API_KEY = "your-key-here"
 ```
-in PowerShell
 
-3. Create Notepad desktop shortcut
+3. Create Notepad desktop shortcut:
+   - Right-click Desktop -> New -> Shortcut
+   - Enter notepad.exe as the location
+   - Name it "Notepad"
 
 
 ## Run
