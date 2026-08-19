@@ -1,0 +1,21 @@
+[project]
+name = "tjm-labs-grounding-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "anthropic>=0.122.0",
+    "mss>=10.2.0",
+    "pillow>=12.3.0",
+    "pyautogui>=0.9.54",
+    "pywin32>=312",
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+tjm-labs-grounding-agent = "tjm_labs_grounding_agent:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
